@@ -169,3 +169,6 @@ TO_CHAR() : 날짜 또는 숫자를 문자열로 변환
  A.M. 또는 P.M. : 오전 또는 오후를 나타내는 마침표가 있는 자오선 표시를 반환
  
 */
+
+SELECT last_name, TO_CHAR(hire_date, 'YYYY/MM/DD HH24:MI:SS') AS HIREDATE
+from employees; 
