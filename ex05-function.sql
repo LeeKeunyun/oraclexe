@@ -123,27 +123,27 @@ from dual;
 
 select ADD_MONTHS(TO_DATE('2022-12-16', 'YYYY-MM-DD'), 1) AS "결과"
 from dual;
--- 결과 : 16-01-23
+-- 결과 : 16-JAN-23
 
 select NEXT_DAY(TO_DATE('2023-08-05', 'YYYY-MM-DD'), 7) AS "결과"
 from dual;
--- 결과 : 12-08-23
+-- 결과 : 12-AUG-23
 
 select LAST_DAY(TO_DATE('2023-08-05', 'YYYY-MM-DD')) AS "결과" from dual;
 select LAST_DAY(SYSDATE) AS "결과" from dual;
--- 결과 : 31-08-23
+-- 결과 : 31-AUG-23
 
 select ROUND(TO_DATE('2023-08-02', 'YYYY-MM-DD'), 'month') AS "결과" from dual;
--- 결과 : 01-08-23
+-- 결과 : 01-AUG-23
 
 select ROUND(TO_DATE('2023-08-26', 'YYYY-MM-DD'), 'month') AS "결과" from dual;
--- 결과 : 01-09-23
+-- 결과 : 01-SEP-23
 
 select TRUNC(TO_DATE('2023-08-02', 'YYYY-MM-DD'), 'month') AS "결과" from dual;
--- 결과 : 01-08-23
+-- 결과 : 01-AUG-23
 
 select TRUNC(TO_DATE('2023-08-26', 'YYYY-MM-DD'), 'month') AS "결과" from dual;
--- 결과 : 01-08-23
+-- 결과 : 01-AUG-23
 
 
 
@@ -172,3 +172,191 @@ TO_CHAR() : 날짜 또는 숫자를 문자열로 변환
 
 SELECT last_name, TO_CHAR(hire_date, 'YYYY/MM/DD HH24:MI:SS') AS HIREDATE
 from employees; 
+
+
+/*
+18. 타임스탬프 : 날짜정보 + 밀리세컨드
+*/
+select TO_CHAR(SYSTIMESTAMP, 'YYYY-MM-DD HH24:MI:SS.FF2') from dual;
+-- sql developer 에서는 결과가 2023-08-05 16:08:20.24 로 표시
+
+
+/*
+
+19. TO_CHAR() 함수를 숫자에 사용할 때
+
+ 9 : 숫자
+ 0 : 0 이 표시되도록 강제로 적용
+ $ : 부동 달러 기호를 배치
+ L : 부동 로컬 통화 기호를 사용 (한국에서는 ￦ 가 표시됨)
+ . : 소수점
+ , : 천단위 표시자 쉼표
+ 
+*/
+
+SELECT 
+    salary
+    , TO_CHAR(salary, 'L99,999.00') SALARY1
+FROM employees
+where last_name = 'Ernst';
+--     6000    ￦6,000.00
+
+
+
+-- 20. TO_DATE() 함수 : 문자열을 DATE 타입으로 변환
+select
+    last_name, 
+    hire_date,
+    TO_CHAR(hire_date, 'YYYY-MM-DD') AS "결과"
+from
+    employees
+where
+    hire_date < TO_DATE('2005-01-01', 'YYYY-MM-DD');
+
+
+
+/*
+
+21. 함수 중첩
+   단일 행 함수는 어떠한 레벨로도 중첩될 수 있음.
+   중첩된 함수는 가장 깊은 레벨에서 가장 낮은 레벨로 평가됨.
+   
+*/
+
+select
+    last_name, 
+    UPPER(CONCAT(SUBSTR(last_name, 1, 8), '_US')) AS "결과"
+from
+    employees
+where
+    department_id = 60;
+    
+    
+    
+    
+/*
+
+22. NVL() 함수 : null 값을 실제 지정한 값으로 반환
+ ============= 중요 !
+ 
+ 참고로, null 이 연산이 안될때 사용한다.
+ null 은 
+    0 과는 다른 성격으로서, 연산을 할 수 없다.
+    곱하기 더하기 등의 연산이 안되며, 비교는 is null 로 해야한다)
+
+*/
+
+SELECT 
+    last_name
+    , salary
+    , commission_pct
+    , NVL(commission_pct, 0) AS "NVL comm"
+    , (salary * 12) AS "Y_SAL"
+    , (salary * 12) + (salary * 12 * commission_pct) AS INVALID_AN_SAL
+    , (salary * 12) + (salary * 12 * NVL(commission_pct, 0)) AS AN_SAL
+FROM
+    employees;
+    
+    
+/*
+
+23. NVL2() 함수
+ : 첫 번째 표현식을 검사합니다. 첫 번째 표현식이 null 이 아니면 두번째 표현식을 반환합니다.
+ :                           첫 번째 표현식이 null 이면 세번째 표현식이 반환됩니다.
+
+*/
+
+SELECT 
+    last_name
+    , salary
+    , commission_pct
+    , NVL2(commission_pct, 'SAL+COMM', 'SAL') AS income
+FROM
+    employees
+WHERE
+    department_id IN (50, 80);
+
+
+
+/*
+
+24. NULLIF() 함수
+ : 두 표현식을 비교하여 같으면 null 을 반환하고 다르면 expr1 을 반환한다
+   그러나 expr1 에 대해 리터럴 NULL 을 지정할 수 없다.  
+ 
+*/
+
+SELECT 
+    first_name
+    , LENGTH(first_name) AS expr1
+    , last_name
+    , LENGTH(last_name) AS expr2
+    , NULLIF(LENGTH(first_name), LENGTH(last_name)) AS result
+SELECT 
+    first_name
+    , LENGTH(first_name) AS expr1
+    , last_name
+    , LENGTH(last_name) AS expr2
+    , NULLIF(LENGTH(first_name), LENGTH(last_name)) AS result
+FROM employees;
+
+
+/*
+25. COALESCE()
+ : 리스트에서 null 이 아닌 첫번째 표현식을 반환
+
+ 아래 예제에는 3개식이 있다.
+ 먼저, 첫번째식부터 체크하는데, 
+    첫번째식이 널이 아니면 첫번째식을 반환하고 끝낸다.
+    첫번째식이 널일 경우, 두번째식을 체크하는데,
+        두번째식이 널이 아니면 두번째식을 반환하고 끝낸다.
+        두번째식이 널일 경우, 세번째식을 반환하고 끝낸다.
+ 
+*/
+
+select 
+    last_name
+    , employee_id
+    , commission_pct
+    , manager_id
+    , COALESCE(TO_CHAR(commission_pct), TO_CHAR(manager_id), 'No commission and no manager') AS result
+FROM employees;
+
+    
+/* 
+26. 조건부 표현식  ================= 중요!
+
+    case 식
+       IF-THEN-ELSE 문 작업을 수행하여 조건부 조회를 편리하게 수행하도록 한다.
+
+*/
+
+SELECT
+    last_name
+    , job_id
+    , salary
+    , CASE job_id
+            WHEN 'IT_PROG' THEN 1.10 * salary
+            WHEN 'ST_CLERK' THEN 1.15 * salary
+            WHEN 'SA_REP' THEN 1.20 * salary
+            ELSE salary
+      END AS REVISED_SALARY
+FROM employees;
+
+
+/* 
+27. 조건부 표현식2  ================= 중요!
+
+    decode 식은 case 식과 유사한 작업을 수행한다.
+
+*/
+
+SELECT
+    last_name
+    , job_id
+    , salary
+    , DECODE(job_id, 'IT_PROG', 1.10 * salary,
+                     'ST_CLERK', 1.15 * salary,
+                     'SA_REP', 1.20 * salary,
+                      salary ) AS REVISED_SALARY
+FROM employees;
