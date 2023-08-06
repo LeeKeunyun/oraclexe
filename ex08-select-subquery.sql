@@ -120,6 +120,8 @@ and
  1-4. EXISTS 연산자
   서브쿼리에서 최소한 한 개의 행을 반환하면 TRUE 로 평가됩니다.
 */
+
+-- 1-4-1.
 select * from departments
 where NOT EXISTS (
     SELECT
@@ -139,8 +141,11 @@ where NOT EXISTS (
 --
 -- 따라서, 16개가 최종결과가 나온다.
 
+
+
+-- 1-4-2.
 select * from departments
-where NOT IN (
+where department_id NOT IN (
     SELECT
         department_id
     FROM
@@ -149,10 +154,11 @@ where NOT IN (
         EMPLOYEES.DEPARTMENT_ID = DEPARTMENTS.DEPARTMENT_ID
 )
 ; 
+-- 위 쿼리 (1-4-1) 와 동일한 결과
 
 
 
-
+-- 1-4-3.
 select * from departments
 where EXISTS (
     SELECT
