@@ -184,10 +184,180 @@ on
 
 -- 1-8. Nonequijoin
 --  등호 연산자 외의 다른 연산자를 포함하는 조인 조건이다.
+--  일단 아래 주석처리된 쿼리를 실행하여 job_grades 테이블을 만들고 데이터를 넣자. 그리고 커밋을 하자.
+--  아래 예제는 등호 외에 범위로도 조인을 할 수 있음을 보여준다.
+
+select 
+    E.last_name
+    , E.salary
+    , J.grade_level
+from
+    employees E
+join
+    job_grades J
+ON
+    E.salary BETWEEN J.lowest_sal AND J.highest_sal;
+    
+    
+/*
+CREATE TABLE job_grades (
+grade_level CHAR(1),
+lowest_sal NUMBER(8,2) NOT NULL,
+highest_sal NUMBER(8,2) NOT NULL
+);
+
+ALTER TABLE job_grades
+ADD CONSTRAINT jobgrades_grade_pk PRIMARY KEY (grade_level)
+;
+
+INSERT INTO job_grades VALUES ('A', 1000, 2999);
+INSERT INTO job_grades VALUES ('B', 3000, 5999);
+INSERT INTO job_grades VALUES ('C', 6000, 9999);
+INSERT INTO job_grades VALUES ('D', 10000, 14999);
+INSERT INTO job_grades VALUES ('E', 15000, 24999);
+INSERT INTO job_grades VALUES ('F', 25000, 40000);
+
+COMMIT;
+*/
 
 
 
 
+/*
+
+
+
+
+
+
+
+-- /////////////////////////////////////////////////
+
+
+
+2. INNER join 과 OUTER join
+
+ INNER join : 일치하지 않는 행은 출력에 표시되지 않음(교집합 해당 행 출력).
+ OUTER join : 한 테이블의 행을 기반으로 다른 테이블과의 연결이 없는 행까지 포함하여 반환함. 
+
+*/
+
+/*
+ 2-1. Left outer join
+ 
+ 사원 테이블 data 는 107 개.
+ 그런데 inner join 을 하면 106 개다.
+ 그 이유는 부서번호가 null 사원이 1명 있기 때문이다.
+ 모든 사원을 나오게 하는것이 outer join 이다.
+
+ 그렇다면 left outer join 은 무엇인가 ?
+ DEPARTMENTS 테이블에 대응되는 행이 없어도
+ 왼쪽 테이블인 EMPLOYEES 테이블의 모든 행을 검색함을 의미한다.
+
+*/
+select 
+    e.last_name
+    , e.department_id
+    , d.department_name
+from
+    employees e
+LEFT OUTER JOIN
+    departments d
+ON 
+    e.department_id = d.department_id
+;
+
+-- 위 쿼리와 동일 (but, 위 쿼리가 ANSI 표준이다)
+select 
+    e.last_name
+    , e.department_id
+    , d.department_name
+from
+    employees e, departments d
+WHERE 
+    e.department_id = d.department_id(+)
+;
+
+
+
+
+/*
+ 2-2. Right outer join
+ EMPLOYEES 테이블에 대응되는 행이 없어도
+ 오른쪽 테이블인 DEPARTMENTS 테이블의 모든 행을 검색함
+*/
+select 
+    e.last_name
+    , d.department_id -- e.department_id 로 하면 데이터가 null 인 경우가 있으므로 d.department_id 로 해야 함
+    , d.department_name
+from
+    employees e
+RIGHT OUTER JOIN
+    departments d
+ON 
+    e.department_id = d.department_id
+;
+
+
+
+
+/*
+2-3. Full outer join
+ DEPARTMENTS, EMPLOYEES 테이블에 대응되는 행이 없어도
+ 테이블의 모든 행을 검색한다.
+*/
+select 
+    e.last_name
+    , d.department_id
+    , d.department_name
+from
+    employees e
+FULL OUTER JOIN
+    departments d
+ON 
+    e.department_id = d.department_id
+;
+-- 123개
+-- last_name 이 널이다 (사원이 없는 부서가 있다)
+-- department_name 이 널이다 (부서에 소속되지 않은 사원이 있다)
+
+
+
+
+-- /////////////////////////////////////////////////
+
+
+/*
+3. Cartesian Product
+ 조인 조건이 잘못되거나 완전히 생략된 경우
+ 결과가 모든 행의 조합이 표시되는
+ Cartesian Product 로 나타냅니다.
+ 
+ (= 경우의 수가 다 나온다)
+*/
+
+/*
+ Cross Join
+  두 테이블의 교차 곱을 생성합니다.
+
+select
+    last_name
+    , department_name
+from
+    employess
+CROSS JOIN
+    departments
+;
+-- employess * departments 갯수 대로 결과가 나옴
+*/
+
+
+
+
+
+select * from employees where department_id is not null;
+select * from employees where department_id is not null;
+select * from job_grades;
 select * from employees;
 select * from employees where manager_id = 149;
 select * from departments;
