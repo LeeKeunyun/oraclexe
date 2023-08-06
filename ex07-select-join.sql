@@ -266,6 +266,12 @@ LEFT OUTER JOIN
 ON 
     e.department_id = d.department_id
 ;
+-- 결과 107개
+-- Why ?
+--  전체 사원수 107
+--  부서에 소속된 사원수 106 (소속되지 않은 사원수 1)
+-- 따라서, 결과는 107 이다 (부서에 소속되지 않은 사원까지 보여진다).
+
 
 -- 위 쿼리와 동일 (but, 위 쿼리가 ANSI 표준이다)
 select 
@@ -297,8 +303,13 @@ RIGHT OUTER JOIN
 ON 
     e.department_id = d.department_id
 ;
-
-
+-- 결과 : 122개
+-- why ?
+--  부서 수 27
+--  사원이 있는 부서는 11개이다 (없는 부서 16개)
+--  전체 사원수 107
+--  부서에 소속된 사원수 106 (소속되지 않은 사원수 1)
+-- 따라서 부서에 소속된 사원수 106 + 사원이 없는 부서 16 을 더하면 122가 된다.
 
 
 /*
@@ -359,5 +370,6 @@ select * from employees where department_id is not null;
 select * from employees where department_id is not null;
 select * from job_grades;
 select * from employees;
+select distinct department_id from employees;
 select * from employees where manager_id = 149;
 select * from departments;
