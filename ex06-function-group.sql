@@ -188,3 +188,6 @@ select MAX(AVG(SALARY)) as max_avg_ret
 from employees
 group by department_id;
 -- 7-1. group by 1번째 예제에 max 를 추가 적용한 것이라 보면 됨
+
+
+
