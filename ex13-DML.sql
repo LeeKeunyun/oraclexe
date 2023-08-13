@@ -237,8 +237,8 @@ SELECT * FROM COPY_EMP;
   
 */
 
-/*
 -- 9-1. 예시
+/*
 CREATE TABLE MEMBER
 (
     NUM NUMBER PRIMARY KEY,
@@ -246,11 +246,13 @@ CREATE TABLE MEMBER
     ADDR VARCHAR2(50)
 )
 ;
+*/
 
 -- 9-2.
 -- INSERT 시,
 -- 테이블명과 VALUES 사이 컬럼이 생략되면,
 -- 테이블내 전체 멤버에 대한 VALUE 를 써줘야 한다
+/*
 INSERT INTO MEMBER VALUES(1, '피카츄', '태초마을');
 COMMIT;
 INSERT INTO MEMBER VALUES(2, '라이츄', '태초마을');
@@ -259,5 +261,47 @@ INSERT INTO MEMBER VALUES(4, '꼬부기', '태초마을');
 
 */
 
+
+
+-- 9-3. SAVEPOINT
+/*
+INSERT INTO MEMBER VALUES(5, '버터플', '태초마을');
+SAVEPOINT mypoint;
+INSERT INTO MEMBER VALUES(6, '야도란', '태초마을');
+INSERT INTO MEMBER VALUES(7, '피존투', '태초마을');
+INSERT INTO MEMBER VALUES(8, '또가스', '태초마을');
+ROLLBACK TO mypoint;
+COMMIT;
+*/
+
 SELECT * FROM MEMBER;
 DESC MEMBER;
+
+
+
+
+
+
+
+
+
+
+
+/*
+10. SELECT 문의 FOR UPDATE 절
+    FOR UPDATE 는 특정 레코드를 잠금(LOCK) 처리하는 SQL 구문입니다.
+    COMMIT 또는 ROLLBACK 잠금해제 합니다.    
+*/
+
+-- 10-1. 락 설정
+-- 아래 결과 값을 모두 락 처리시킨다
+/*
+SELECT EMPLOY_ID, SALARY, JOB_ID
+FROM EMPLOYEES
+WHERE JOB_ID = 'SA_REP'
+FOR UPDATE;
+*/
+
+-- 10-2. 락 해제는 COMMIT, ROLLBACK 으로 해제
+
+
