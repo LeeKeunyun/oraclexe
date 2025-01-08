@@ -1,1 +1,1 @@
-ORACLE 수업2
+ORACLE 수업2-2
